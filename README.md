@@ -14,16 +14,10 @@ A simple Telegram bot built with [Telethon](https://docs.telethon.dev/) and [yt-
 1. Clone this repo:
 
    ```bash
-   git clone the repo
-   cd yt-audio-bot
-   ```
-2. Create and activate a virtual environment:
-
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-3. Install dependencies:
+   git clone https://github.com/timamz/link-to-audio-bot
+   cd link-to-audio-bot
+   `````
+2. Install dependencies:
 
    ```bash
    pip install -r requirements.txt
