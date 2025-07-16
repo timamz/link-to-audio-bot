@@ -36,8 +36,8 @@ Create a `.env` file in the project root (or set environment variables directly)
 
 ```ini
 API_ID=1234567
-API_HASH=your_api_hash_here
-BOT_TOKEN=123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
+API_HASH=your_api_hash
+BOT_TOKEN=you_bot_token
 COOKIE_FILE=path/to/cookies.txt
 ```
 
@@ -48,7 +48,9 @@ COOKIE_FILE=path/to/cookies.txt
 ## Usage
 
 ```bash
-python bot.py
+docker build -t link_to_video_bot --build-arg API_ID=$API_ID --build-arg API_HASH=$API_HASH  --build-arg BOT_TOKEN=$BOT_TOKEN . && docker run -d --name bot link_to_video_bot
 ```
+
+## IMPORTANT: Don't post the image anywhere since it contains secret tokens
 
 Once running, send a YouTube link into any chat with the bot. It will reply “⏳ Downloading audio...” and then send you the MP3 file.
