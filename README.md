@@ -4,7 +4,6 @@ A simple Telegram bot built with [Telethon](https://docs.telethon.dev/) and [yt-
 
 ## Prerequisites
 
-* Python 3.8+
 * A Telegram bot token (from [@BotFather](https://t.me/BotFather))
 * `API_ID` and `API_HASH` (from [https://my.telegram.org](https://my.telegram.org))
 * A valid `cookies.txt` file exported from your browser (optional, but required for some videos)
@@ -17,11 +16,6 @@ A simple Telegram bot built with [Telethon](https://docs.telethon.dev/) and [yt-
    git clone https://github.com/timamz/link-to-audio-bot
    cd link-to-audio-bot
    `````
-2. Install dependencies:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
 
 ## Configuration
 
@@ -43,7 +37,7 @@ COOKIE_FILE=path/to/cookies.txt
 
 * **API\_ID** and **API\_HASH**: Obtain from [https://my.telegram.org](https://my.telegram.org)
 * **BOT\_TOKEN**: Provided by @BotFather
-* **COOKIE\_FILE**: Path to your exported `cookies.txt` (defaults to `cookies.txt` in project root)
+* **COOKIE\_FILE**  `cookies.txt` in project roo)
 
 ## Usage
 
