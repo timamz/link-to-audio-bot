@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 import tempfile
 import threading
 from http import HTTPStatus
@@ -23,6 +24,16 @@ def require_env(name: str) -> str:
 def optional_cookie_file() -> str | None:
     cookie_path = os.getenv("COOKIE_FILE", "/app/cookies.txt")
     return cookie_path if os.path.isfile(cookie_path) else None
+
+
+def prepare_cookie_copy(download_dir: str) -> str | None:
+    cookie_path = optional_cookie_file()
+    if not cookie_path:
+        return None
+
+    copied_cookie_path = os.path.join(download_dir, "cookies.txt")
+    shutil.copyfile(cookie_path, copied_cookie_path)
+    return copied_cookie_path
 
 
 api_id = int(require_env("API_ID"))
@@ -62,29 +73,39 @@ def start_healthcheck_server() -> None:
 
 async def download_audio(url: str, download_dir: str, bitrate: str = "128") -> tuple[str, str, int]:
     outtmpl = os.path.join(download_dir, '%(id)s.%(ext)s')
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': outtmpl,
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': bitrate,
-        }],
-        'keepvideo': False,
-        'noplaylist': True,
-    }
-    cookie_file = optional_cookie_file()
-    if cookie_file:
-        ydl_opts['cookiefile'] = cookie_file
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        base, _ = os.path.splitext(ydl.prepare_filename(info))
-        file_path = f"{base}.mp3"
-        title = info.get('title', os.path.basename(base))
-        safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '-', '_')).rstrip()
-        duration = int(info.get('duration', 0))
-        return file_path, safe_title, duration
+    def run_download(cookie_file: str | None) -> tuple[str, str, int]:
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'outtmpl': outtmpl,
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': bitrate,
+            }],
+            'keepvideo': False,
+            'noplaylist': True,
+        }
+        if cookie_file:
+            ydl_opts['cookiefile'] = cookie_file
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            base, _ = os.path.splitext(ydl.prepare_filename(info))
+            file_path = f"{base}.mp3"
+            title = info.get('title', os.path.basename(base))
+            safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '-', '_')).rstrip()
+            duration = int(info.get('duration', 0))
+            return file_path, safe_title, duration
+
+    cookie_copy = prepare_cookie_copy(download_dir)
+    try:
+        return run_download(cookie_copy)
+    except yt_dlp.utils.DownloadError:
+        if cookie_copy:
+            logger.warning("yt-dlp failed with cookies, retrying without cookies")
+            return run_download(None)
+        raise
 
 
 @client.on(events.NewMessage(pattern=r'https?://(www\.)?(youtube\.com|youtu\.be)/'))
