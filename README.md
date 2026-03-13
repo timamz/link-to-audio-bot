@@ -31,20 +31,40 @@ Create a `.env` file in the project root (or set environment variables directly)
 ```ini
 API_ID=1234567
 API_HASH=your_api_hash
-BOT_TOKEN=you_bot_token
-COOKIE_FILE=path/to/cookies.txt
+BOT_TOKEN=your_bot_token
+COOKIE_FILE=/app/cookies.txt
+PORT=8080
 ```
 
 * **API\_ID** and **API\_HASH**: Obtain from [https://my.telegram.org](https://my.telegram.org)
 * **BOT\_TOKEN**: Provided by @BotFather
-* **COOKIE\_FILE**  `cookies.txt` in project roo)
+* **COOKIE\_FILE**: Optional path to a mounted `cookies.txt`
+* **PORT**: Optional healthcheck port exposed by the container
 
 ## Usage
 
 ```bash
-docker build -t link_to_video_bot --build-arg API_ID=$API_ID --build-arg API_HASH=$API_HASH  --build-arg BOT_TOKEN=$BOT_TOKEN . && docker run -d --name bot link_to_video_bot
+docker build -t link-to-audio-bot .
 ```
 
-## IMPORTANT: Don't post the image anywhere since it contains secret tokens
+Run the bot with runtime environment variables instead of baking secrets into the image:
+
+```bash
+docker run -d \
+  --name link-to-audio-bot \
+  --env-file .env \
+  -p 8080:8080 \
+  -v "$(pwd)/cookies.txt:/app/cookies.txt:ro" \
+  link-to-audio-bot
+```
+
+If you do not need YouTube cookies for the videos you process, omit both the `COOKIE_FILE` variable and the volume mount.
+
+Check that the deployed container is healthy:
+
+```bash
+docker ps
+curl http://localhost:8080/healthz
+```
 
 Once running, send a YouTube link into any chat with the bot. It will reply “⏳ Downloading audio...” and then send you the MP3 file.
