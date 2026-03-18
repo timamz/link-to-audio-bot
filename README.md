@@ -43,27 +43,24 @@ PORT=8080
 
 ## Usage
 
+Build and run in one command with Docker Compose:
+
 ```bash
-docker build -t link-to-audio-bot .
+docker compose up --build -d
 ```
 
-Run the bot with runtime environment variables instead of baking secrets into the image:
+Stop the bot:
 
 ```bash
-docker run -d \
-  --name link-to-audio-bot \
-  --env-file .env \
-  -p 8080:8080 \
-  -v "$(pwd)/cookies.txt:/app/cookies.txt:ro" \
-  link-to-audio-bot
+docker compose down
 ```
 
-If you do not need YouTube cookies for the videos you process, omit both the `COOKIE_FILE` variable and the volume mount.
+If you do not need YouTube cookies, remove the `volumes` section from `compose.yaml` and omit `COOKIE_FILE` from `.env`.
 
-Check that the deployed container is healthy:
+Check that the bot is healthy:
 
 ```bash
-docker ps
+docker compose logs
 curl http://localhost:8080/healthz
 ```
 
