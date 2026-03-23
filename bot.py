@@ -41,7 +41,44 @@ api_hash = require_env("API_HASH")
 bot_token = require_env("BOT_TOKEN")
 session_name = os.getenv("SESSION_NAME", "bot_session")
 health_port = int(os.getenv("PORT", "8080"))
-client = TelegramClient(session_name, api_id, api_hash)
+
+
+def parse_proxy_url(url: str | None) -> dict | None:
+    """Parse a SOCKS5 proxy URL into a dict for Telethon.
+
+    Expected format: socks5://user:password@host:port
+    """
+    if not url:
+        return None
+    from urllib.parse import urlparse
+    parsed = urlparse(url)
+    scheme = parsed.scheme.lower()
+    import socks
+    proxy_type = {
+        "socks5": socks.SOCKS5,
+        "socks4": socks.SOCKS4,
+        "http": socks.HTTP,
+    }.get(scheme)
+    if proxy_type is None:
+        raise ValueError(f"Unsupported proxy scheme: {scheme}")
+    return {
+        "proxy_type": proxy_type,
+        "addr": parsed.hostname,
+        "port": parsed.port,
+        "username": parsed.username,
+        "password": parsed.password,
+        "rdns": True,
+    }
+
+
+proxy_url = os.getenv("PROXY_URL")
+proxy = parse_proxy_url(proxy_url)
+if proxy:
+    logger.info("Using proxy: %s:%s", proxy["addr"], proxy["port"])
+else:
+    logger.info("No proxy configured")
+
+client = TelegramClient(session_name, api_id, api_hash, proxy=proxy)
 HEALTH_STATE = {"ready": False}
 
 
