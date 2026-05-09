@@ -2,6 +2,12 @@ services:
   bot:
     build: .
     env_file: .env
+    environment:
+      BOT_API_SERVER: http://host.docker.internal:18081
+      MAX_BOT_UPLOAD_BYTES: "1992294400"
+      UPLOAD_TIMEOUT: "7200"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./cookies.txt:/app/cookies.txt:ro
     ports:

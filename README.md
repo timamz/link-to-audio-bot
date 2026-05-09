@@ -1,6 +1,6 @@
-# YouTube Audio Downloader Bot
+# YouTube Downloader Bot
 
-A simple Telegram bot built with [Telethon](https://docs.telethon.dev/) and [yt-dlp](https://github.com/yt-dlp/yt-dlp) that listens for YouTube links in chats, downloads the audio track as an MP3, and sends it back to the user.
+A simple Telegram bot built with [aiogram](https://docs.aiogram.dev/) and [yt-dlp](https://github.com/yt-dlp/yt-dlp) that listens for YouTube links in chats, asks what to download, and sends back either MP3 audio, 720p video, or 1080p video.
 
 ## Prerequisites
 
@@ -64,4 +64,10 @@ docker compose logs
 curl http://localhost:8080/healthz
 ```
 
-Once running, send a YouTube link into any chat with the bot. It will reply “⏳ Downloading audio...” and then send you the MP3 file.
+Once running, send a YouTube link into any chat with the bot. It will show buttons for:
+
+* 🎧 Audio MP3
+* 🎬 Video 720p
+* 🎬 Video 1080p
+
+After you choose an option, it downloads and sends the selected file.
