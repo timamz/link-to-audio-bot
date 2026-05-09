@@ -565,12 +565,7 @@ async def handle_download_choice(callback: CallbackQuery) -> None:
             )
         except TelegramNetworkError as e:
             logger.exception("Telegram network error while sending file")
-            if "ServerDisconnectedError" in str(e):
-                await callback.message.answer(
-                    "⚠️ Telegram closed the upload connection after a large file transfer. "
-                    "If the video appeared above, everything is fine; if not, send the link again."
-                )
-            else:
+            if "ServerDisconnectedError" not in str(e):
                 await callback.message.answer(f"❌ Telegram upload failed: {e}")
         except Exception as e:
             logger.exception("Failed to download or send file")
